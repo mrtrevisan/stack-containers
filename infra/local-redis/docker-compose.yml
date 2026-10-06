@@ -1,0 +1,51 @@
+volumes:
+  redisinsight-data:
+    driver: local
+
+services:
+  # Redis 7.4 (cache)
+  redis:
+    image: redis:7.4-alpine
+    container_name: local-redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD:?defina REDIS_PASSWORD no .env}"]
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # RedisInsight (UI)
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    depends_on:
+      - redis
+    environment:
+      # conexão pré-cadastrada com o Redis
+      RI_REDIS_HOST: local-redis
+      RI_REDIS_PORT: 6379
+      RI_REDIS_ALIAS: local-redis
+      RI_REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redisinsight-data:/data
+    restart: unless-stopped
+    networks:
+      - internal
+      - traefik-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-proxy"
+      - "traefik.http.routers.redisinsight.entrypoints=http"
+      - "traefik.http.routers.redisinsight.rule=Host(`redisinsight.cloud.local`)"
+      - "traefik.http.middlewares.redisinsight-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.redisinsight.middlewares=redisinsight-https-redirect"
+      - "traefik.http.routers.redisinsight-secure.entrypoints=https"
+      - "traefik.http.routers.redisinsight-secure.rule=Host(`redisinsight.cloud.local`)"
+      - "traefik.http.routers.redisinsight-secure.tls=true"
+      - "traefik.http.services.redisinsight.loadbalancer.server.port=5540"
+
+networks:
+  internal:
+    external: true
+  traefik-proxy:
+    external: true
