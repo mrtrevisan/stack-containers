@@ -19,22 +19,24 @@ services:
         cap_add:
             - SYS_NICE  # CAP_SYS_NICE
         networks:
-            - traefik-proxy
+            - internal
 
     # PHPMyAdmin
     phpmyadmin:
         image: phpmyadmin
         container_name: phpmyadmin
-        links: 
-            - mysql:db
+        depends_on:
+            - mysql
         env_file: .env
         environment:
+            - PMA_HOST=mysql
             - PMA_ABSOLUTE_URI=http://$PMA_URL
             - UPLOAD_LIMIT=200M
         volumes:
             - ./name.conf:/etc/apache2/conf-enabled/name.conf
         restart: unless-stopped
         networks:
+            - internal
             - traefik-proxy
         labels:
             - "traefik.enable=true"
@@ -50,4 +52,6 @@ services:
 
 networks:
   traefik-proxy:
+    external: true
+  internal:
     external: true
