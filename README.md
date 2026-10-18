@@ -1,4 +1,4 @@
-# stack-containers
+# Stack Local de Containers
 
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Traefik](https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=white)
@@ -13,25 +13,25 @@
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 
-Provisionamento de containers gerenciado pelo portainer + traefik usando TLS.
+Provisionamento de containers de Infra gerenciado pelo Portainer + Traefik, usando TLS.
 
-## Tecnlologias e requisitos:
+## Tecnlologias e Requisitos:
 - Docker - https://www.docker.com/
 - Docker-compose - https://docs.docker.com/compose/
 - Portainer - https://www.portainer.io/
 - Traefik - https://github.com/traefik/traefik
-- mkcert - ferramenta para criar certificados de desenvolvimento localmente confiáveis.  https://github.com/FiloSottile/mkcert
+- Mkcert - ferramenta para criar certificados de desenvolvimento localmente confiáveis.  https://github.com/FiloSottile/mkcert
 - edição do arquivo `hosts` do sistema (simulando um DNS local)
 
 Basicamente criamos um deploy do traefik para gerenciar as coenxoes com um dominio local. (*.local.test)
 
 ![](./docs/images/traefik-architecture.webp)
 
-Passos a seguir consideram já o Docker e o docker-compose instalados no sistema. 
+Passos a seguir consideram já o Docker e o Docker-Compose instalados no sistema. 
 
-###  gerando certificado local
+###  Gerando Certificado Local
 Instalar o mkcert no sistema operacional utilizado:
-Windows (utilizando winget): abra o prompt de comando do windows e digite:
+Windows (utilizando winget): abra o prompt de comando do Windows e digite:
 ```
 winget install mkcert -s winget 
 ```
@@ -40,7 +40,7 @@ Instalando autoridade certificadora local
 ```
 mkcert -install
 ```
-Gerando certificado para os dominios (exemplo utilizado: local.test).
+Gerando certificado para os domínios (exemplo utilizado: local.test).
 Gerar o o certifcado a partir da pasta `core`. Os certificados vao ser armazenados na pasta `certs`.
 
 ```
@@ -48,10 +48,10 @@ cd core
 mkcert -cert-file certs/local-cert.pem -key-file certs/local-key.pem "local.test" "*.local.test" "cloud.local" "*.cloud.local"
 ```
 
-###  Iniciando o traefik e o portainer
-A partir da posta core digitar os seguintes comandos:
+###  Iniciando o Traefik e o Portainer
+A partir da posta `core` digitar os seguintes comandos:
 
-Criar uma rede do tipo bridge (padrão do docker), porém com um nome. (exemplo utilizado: traefik-proxy)
+Criar uma rede do tipo bridge (padrão do Docker), porém com um nome. (exemplo utilizado: traefik-proxy)
 ```
 docker network create traefik-proxy
 ```
@@ -61,14 +61,14 @@ Verificar se o arquivo de manifesto está ok (a saida é o próprio manifesto ym
 docker-compose config
 ```
 
-Iniciar a stack core com o parametro -d (Detached mode) rodando em background. A partir da pasta core, executar:
+Iniciar a stack core com o parametro -d (detached mode) rodando em background. A partir da pasta core, executar:
 ```
 docker-compose up -d
 ```
 
 Editar o arquivo hosts e inserir os dominios locais (template pode ser encontrado na poasta docs):
 
-Windows - abrir o nodepad como administrador
+Windows - abrir o Notepad como administrador
 ```
 C:\Windows\System32\drivers\etc\hosts
 ```
@@ -83,6 +83,6 @@ Linux e Mac - editar usando sudo
 
 Abrir o navegador e digitar a url:
 ```
-http://portainer.local.test
+http://portainer.cloud.local
 ```
 
