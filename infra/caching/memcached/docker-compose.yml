@@ -1,0 +1,15 @@
+services:
+  # Memcached 1.6 (cache)
+  # sem persistência por natureza; ao atingir o limite de memória, despeja por LRU
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: local-memcached
+    # -m: limite de memória em MB (mesmo do Redis) | -c: máximo de conexões | -I: tamanho máximo de um item
+    command: ["memcached", "-m", "64", "-c", "1024", "-I", "1m"]
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  internal:
+    external: true
